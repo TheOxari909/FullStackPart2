@@ -12,13 +12,12 @@ const Content = ({ course }) => (
   </div>
 )
 
-const Total = ({ course }) => {
-  let total = 0
-
-  course.forEach(e => {
-    total += e.exercises
-  })
-
+const Total = ({ parts }) => {
+  const total =
+    parts.reduce((totaled, toAdd) => {
+      return totaled + toAdd.exercises
+    }, 0)
+  
   return (
     <h3>
       total of {total} exercises
@@ -30,7 +29,7 @@ const Course = ({ course }) => (
   <div>
     <Header name={course.name} />
     <Content course={course.parts} />
-    <Total course={course.parts}/>
+    <Total parts={course.parts}/>
   </div>
 )
 
