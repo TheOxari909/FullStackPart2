@@ -12,6 +12,34 @@ const Filter = ({ filter, handleChange }) => (
   </div>
 )
 
+const Weather = ({ city }) => {
+  const api_key = process.env.REACT_APP_API_KEY
+  const [weather, setWeather] = useState([])
+  const [done, setDone] = useState(false)
+  
+  useEffect(() => {
+  axios
+    .get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${api_key}&units=metric`)
+    .then(response => {
+      setWeather(response.data)
+      setDone(true)
+      console.log()
+    })
+  }, [])
+
+  return (
+    done === true ?
+    <div>
+      <h3> Weather in {city} </h3>
+      <div> Temperature is {weather.main.temp} °C</div>
+      <img src={`http://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`} />
+      <div>wind speed is {weather.wind.speed} m/s</div>
+    </div>
+    :
+    <div>waiting...</div>
+  )
+}
+
 const DetailedCountry = ({ country }) => {
   return (
     <div>
@@ -26,6 +54,9 @@ const DetailedCountry = ({ country }) => {
         ))}
       </ul>
       <img height="150px" alt="flag" src={country.flags.png}/>
+      <Weather 
+        city={country.capital}
+      />
     </div>
   )
 }
@@ -47,7 +78,9 @@ const ListCountries = ({ countries }) => {
   }
   else if (countries.length === 1) {
     return (
-      <DetailedCountry country={countries[0]} />
+      <DetailedCountry 
+        country={countries[0]}
+        />
     )
   }
 }
@@ -56,13 +89,16 @@ function App() {
   const [filter, setFilter] = useState('')
   const [countries, setCountries] = useState([])
   const [filteredCountries, setFilteredCountries] = useState(countries)
-
+  const [done, isDone] = useState(false)
+ 
 
   useEffect(() => {
     axios
       .get('https://restcountries.com/v3.1/all')
       .then(response => {
         setCountries(response.data)
+        setFilteredCountries(response.data)
+        isDone(true)
       })
   }, [])
   
@@ -81,8 +117,13 @@ function App() {
         filter={filter}
         handleChange={handleChange}
       />
-      <ListCountries 
-        countries={filteredCountries}/>
+      {done === true ? 
+        <ListCountries 
+          countries={filteredCountries}
+          />
+        :
+        <div>Loading countries...</div>
+      }
     </div>
   )
 }
