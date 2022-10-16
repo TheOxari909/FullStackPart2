@@ -12,6 +12,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
   const [notification, setNotification] = useState(null)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     console.log('effect')
@@ -36,9 +37,18 @@ const App = () => {
           .then(returnedPerson => {
             const newPerson = persons.map(person => person.name !== newName ? person : returnedPerson)
             setFiltered(newPerson)
-            setPersons(newPerson)
+            setPersons(newPerson)        
+            setNotification(`${newName}'s number was changed`)
+
           })
-        setNotification(`${newName}'s number was changed`)
+          .catch(e => {
+            setError(`${newName} has been removed already`)
+            
+            const updatedPersons = persons
+              .filter(person => person.id !== exists.id)
+            setPersons(updatedPersons)
+            setFiltered(updatedPersons)
+          })
       }
     } else { 
       const personObject = {
@@ -56,6 +66,7 @@ const App = () => {
     }
     setTimeout(() => {
       setNotification(null)
+      setError(null)
     }, 5000)
 
     setNewName('')
@@ -91,7 +102,7 @@ const App = () => {
         })
 
       const updatedPersons = persons
-        .filter((person) => person.id !== id)
+        .filter(person => person.id !== id)
       setPersons(updatedPersons)
       setFiltered(updatedPersons)
       setNotification(`${name} was deleted`)
@@ -105,6 +116,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={error} isError={true} />
       <Notification message={notification} />
       <Filter newFilter={newFilter} handleChange={handleFilterChange} />
       <h2>add a new</h2>
