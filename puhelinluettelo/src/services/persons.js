@@ -16,8 +16,14 @@ const deleteNum = (id) => {
   return request.then(response => response.data)
 }
 
+const update = (id, changedNum) => {
+  const request = axios.put(`${baseUrl}/${id}`, changedNum)
+  return request.then(response => response.data)
+}
+
 export default {
   getAll,
   add,
   deleteNum,
+  update,
 }
